@@ -24,7 +24,11 @@ function loadComponent(placeholderId, path, callback) {
   const placeholder = document.getElementById(placeholderId);
   if (!placeholder) return;
 
-  fetch(path)
+  // Resolve path relative to <base> tag if present
+  var base = document.querySelector('base');
+  var resolvedPath = base ? base.href + path.replace(/^\//, '') : path;
+
+  fetch(resolvedPath)
     .then(function (response) {
       if (!response.ok) throw new Error('Component not found: ' + path);
       return response.text();
