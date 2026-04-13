@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '<h3 style="margin-bottom:8px;">' + escapeHTML(product.name) + '</h3>' +
             descHTML +
             '<div style="display:flex;flex-direction:column;gap:16px;margin-top:auto;">' +
-              '<a href="' + (document.querySelector('base') ? document.querySelector('base').getAttribute('href').replace(/\/$/, '') : '') + '/pages/contact.html" class="btn btn-sm btn-primary" style="text-align:center;justify-content:center;">I\'m Interested</a>' +
+              '<a href="/pages/contact.html" class="btn btn-sm btn-primary" style="text-align:center;justify-content:center;">I\'m Interested</a>' +
               specSheetHTML +
             '</div>' +
           '</div>';
