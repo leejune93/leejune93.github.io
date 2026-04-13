@@ -3,6 +3,12 @@
  * Loads nav and footer into pages, handles active states and mobile menu
  */
 
+// Detect base path from <base> tag (for GitHub Pages staging)
+var BASE_PATH = (function () {
+  var base = document.querySelector('base');
+  return base ? base.getAttribute('href').replace(/\/$/, '') : '';
+})();
+
 document.addEventListener('DOMContentLoaded', function () {
   loadComponent('nav-placeholder', '/components/nav.html', function () {
     setActiveNav();
@@ -156,11 +162,11 @@ function injectFloatingCta() {
   var bar = document.createElement('div');
   bar.className = 'floating-cta';
   bar.innerHTML =
-    '<a href="/pages/contact.html#booking" class="btn btn-primary btn-sm">' +
+    '<a href="' + BASE_PATH + '/pages/contact.html#booking" class="btn btn-primary btn-sm">' +
       '<span class="btn-float-label-full">Book a Meeting</span>' +
       '<span class="btn-float-label-short">Booking</span>' +
     '</a>' +
-    '<a href="/pages/contact.html" class="btn btn-secondary btn-sm">' +
+    '<a href="' + BASE_PATH + '/pages/contact.html" class="btn btn-secondary btn-sm">' +
       '<span class="btn-float-label-full">Send an Enquiry</span>' +
       '<span class="btn-float-label-short">Enquiry</span>' +
     '</a>' +
