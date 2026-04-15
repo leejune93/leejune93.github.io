@@ -37,6 +37,13 @@
     return url;
   }
 
+  function getThumbnailURL(url) {
+    if (!url) return '';
+    var match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (match) return 'https://drive.google.com/thumbnail?id=' + match[1] + '&sz=w400';
+    return '';
+  }
+
   function escapeHTML(str) {
     var div = document.createElement('div');
     div.textContent = str;
@@ -73,16 +80,18 @@
     pageItems.forEach(function (spec) {
       var card = document.createElement('div');
       card.className = 'card spec-card';
-      card.style.padding = '24px';
+      card.style.cssText = 'padding:0;overflow:hidden;display:flex;flex-direction:row;width:100%;';
+      var thumbURL = getThumbnailURL(spec.pdfLink);
       card.innerHTML =
-        '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">' +
-          '<span style="font-size:24px;">&#128196;</span>' +
-          '<div>' +
-            '<p style="font-size:11px;color:var(--light-grey);margin:0;font-weight:700;letter-spacing:1px;text-transform:uppercase;">' + escapeHTML(spec.categoryLabel) + '</p>' +
-            '<h3 style="font-size:16px;margin:0;">' + escapeHTML(spec.name) + '</h3>' +
-          '</div>' +
+        '<div style="width:140px;min-height:160px;flex-shrink:0;background:var(--bg-light);display:flex;align-items:center;justify-content:center;overflow:hidden;">' +
+          (thumbURL ? '<img src="' + escapeHTML(thumbURL) + '" alt="' + escapeHTML(spec.name) + '" style="width:100%;height:100%;object-fit:cover;">' : '<span style="font-size:48px;color:var(--light-grey);">&#128196;</span>') +
         '</div>' +
-        '<a href="' + escapeHTML(spec.url) + '" class="btn btn-sm btn-accent" target="_blank" style="width:100%;text-align:center;">Download PDF</a>';
+        '<div style="padding:20px;display:flex;flex-direction:column;flex:1;">' +
+          '<p style="font-size:11px;color:var(--light-grey);margin:0 0 4px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">' + escapeHTML(spec.categoryLabel) + '</p>' +
+          '<h3 style="font-size:16px;margin:0 0 8px;">' + escapeHTML(spec.name) + '</h3>' +
+          '<p style="font-size:12px;color:var(--light-grey);margin:0 0 16px;">Available in: <strong style="color:var(--dark-grey);">EN</strong></p>' +
+          '<a href="' + escapeHTML(spec.url) + '" class="btn btn-sm btn-accent" target="_blank" style="text-align:center;margin-top:auto;">Download PDF</a>' +
+        '</div>';
       grid.appendChild(card);
     });
 
@@ -141,34 +150,67 @@
     grid.parentNode.insertBefore(nav, grid.nextSibling);
   }
 
-  fetch(getSheetURL())
+  var PRODUCT_TABS = ['regulators', 'valves', 'filters', 'laboratory-fittings', 'accessories'];
+  var seen = {};
+
+  function addSpec(name, category, pdfLink) {
+    var key = name.toLowerCase() + '|' + pdfLink;
+    if (seen[key]) return;
+    seen[key] = true;
+    allSpecs.push({
+      name: name,
+      category: category,
+      categoryLabel: CATEGORY_LABELS[category] || category,
+      url: convertPdfURL(pdfLink),
+      pdfLink: pdfLink
+    });
+  }
+
+  // Fetch spec-sheets tab (columns: Name, Category, PDF Link)
+  var specSheetFetch = fetch(getSheetURL())
     .then(function (r) { return r.text(); })
     .then(function (text) {
       var json = JSON.parse(text.substring(47, text.length - 2));
       var rows = json.table.rows;
-
       for (var i = 0; i < rows.length; i++) {
         var cells = rows[i].c;
         var name = cells[0] ? (cells[0].v || '').trim() : '';
         var category = cells[1] ? (cells[1].v || '').toLowerCase().trim() : '';
         var pdfLink = cells[2] ? (cells[2].v || '').trim() : '';
-
         if (name && name !== 'Name' && pdfLink) {
-          allSpecs.push({
-            name: name,
-            category: category,
-            categoryLabel: CATEGORY_LABELS[category] || category,
-            url: convertPdfURL(pdfLink)
-          });
+          addSpec(name, category, pdfLink);
         }
       }
-
-      renderCards('all', 1);
     })
     .catch(function (err) {
-      console.error('Failed to load spec sheets:', err);
-      renderCards('all', 1);
+      console.error('Failed to load spec-sheets tab:', err);
     });
+
+  // Fetch each product tab (columns: Name, Type, Desc, Category, Subcategory, Image, Spec Sheet)
+  var productFetches = PRODUCT_TABS.map(function (tab) {
+    var url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(tab);
+    return fetch(url)
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        var json = JSON.parse(text.substring(47, text.length - 2));
+        var rows = json.table.rows;
+        for (var i = 0; i < rows.length; i++) {
+          var cells = rows[i].c;
+          var name = cells[0] ? (cells[0].v || '').trim() : '';
+          var specSheet = cells[6] ? (cells[6].v || '').trim() : '';
+          if (name && name !== 'Name' && specSheet) {
+            addSpec(name, tab, specSheet);
+          }
+        }
+      })
+      .catch(function (err) {
+        console.error('Failed to load product tab ' + tab + ':', err);
+      });
+  });
+
+  Promise.all([specSheetFetch].concat(productFetches)).then(function () {
+    renderCards('all', 1);
+  });
 
   // Filter buttons
   filterBtns.forEach(function (btn) {

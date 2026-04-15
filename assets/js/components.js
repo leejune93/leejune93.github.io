@@ -149,9 +149,11 @@ function initHamburger() {
  */
 function injectFloatingCta() {
   if (window.location.pathname.indexOf('/contact') !== -1) return;
+
   var bar = document.createElement('div');
   bar.className = 'floating-cta';
   bar.innerHTML =
+    '<button class="floating-cta-close">&times;</button>' +
     '<a href="/pages/contact.html#booking" class="btn btn-primary btn-sm">' +
       '<span class="btn-float-label-full">Book a Meeting</span>' +
       '<span class="btn-float-label-short">Booking</span>' +
@@ -166,6 +168,35 @@ function injectFloatingCta() {
     '</div>' +
     '<p class="floating-cta-note">Typically replies within 4 hours</p>';
   document.body.appendChild(bar);
+
+  // Chat bubble icon
+  var bubble = document.createElement('div');
+  bubble.className = 'floating-cta-bubble';
+  bubble.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>';
+  document.body.appendChild(bubble);
+
+  // Check if previously dismissed
+  if (sessionStorage.getItem('cta-dismissed') === 'true') {
+    bar.classList.add('dismissed');
+    setTimeout(function () { bubble.classList.add('visible'); }, 50);
+  }
+
+  // Close button — dismiss bar, show bubble
+  bar.querySelector('.floating-cta-close').addEventListener('click', function () {
+    bar.classList.add('dismissed');
+    sessionStorage.setItem('cta-dismissed', 'true');
+    setTimeout(function () { bubble.classList.add('visible'); }, 300);
+  });
+
+  // Bubble click — restore bar, hide bubble
+  bubble.addEventListener('click', function () {
+    bubble.classList.remove('visible');
+    setTimeout(function () {
+      bar.classList.remove('dismissed');
+      sessionStorage.removeItem('cta-dismissed');
+    }, 300);
+  });
+
   updateAvailabilityStatus();
 }
 
