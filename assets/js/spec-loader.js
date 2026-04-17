@@ -55,8 +55,11 @@
     currentPage = page || 1;
 
     var filtered = filter === 'all'
-      ? allSpecs
+      ? allSpecs.slice()
       : allSpecs.filter(function (s) { return s.category === filter; });
+
+    // Sort by priority (1 = highest, empty = 99)
+    filtered.sort(function (a, b) { return a.priority - b.priority; });
 
     grid.innerHTML = '';
 
@@ -153,7 +156,7 @@
   var PRODUCT_TABS = ['regulators', 'valves', 'filters', 'laboratory-fittings', 'accessories'];
   var seen = {};
 
-  function addSpec(name, category, pdfLink) {
+  function addSpec(name, category, pdfLink, priority) {
     var key = name.toLowerCase() + '|' + pdfLink;
     if (seen[key]) return;
     seen[key] = true;
@@ -162,23 +165,29 @@
       category: category,
       categoryLabel: CATEGORY_LABELS[category] || category,
       url: convertPdfURL(pdfLink),
-      pdfLink: pdfLink
+      pdfLink: pdfLink,
+      priority: priority || 99
     });
   }
 
-  // Fetch spec-sheets tab (columns: Name, Category, PDF Link)
+  // Fetch spec-sheets tab (columns: Name, Category, Priority, PDF Link)
   var specSheetFetch = fetch(getSheetURL())
     .then(function (r) { return r.text(); })
     .then(function (text) {
       var json = JSON.parse(text.substring(47, text.length - 2));
       var rows = json.table.rows;
+      function getCell(cells, index) {
+        if (!cells || index >= cells.length || !cells[index]) return '';
+        return cells[index].v != null ? String(cells[index].v) : '';
+      }
       for (var i = 0; i < rows.length; i++) {
         var cells = rows[i].c;
-        var name = cells[0] ? (cells[0].v || '').trim() : '';
-        var category = cells[1] ? (cells[1].v || '').toLowerCase().trim() : '';
-        var pdfLink = cells[2] ? (cells[2].v || '').trim() : '';
+        var name = getCell(cells, 0).trim();
+        var category = getCell(cells, 1).toLowerCase().trim();
+        var priority = parseInt(getCell(cells, 2), 10) || 99;
+        var pdfLink = getCell(cells, 3).trim();
         if (name && name !== 'Name' && pdfLink) {
-          addSpec(name, category, pdfLink);
+          addSpec(name, category, pdfLink, priority);
         }
       }
     })
@@ -194,12 +203,17 @@
       .then(function (text) {
         var json = JSON.parse(text.substring(47, text.length - 2));
         var rows = json.table.rows;
+        function getCellP(cells, index) {
+          if (!cells || index >= cells.length || !cells[index]) return '';
+          return cells[index].v != null ? String(cells[index].v) : '';
+        }
         for (var i = 0; i < rows.length; i++) {
           var cells = rows[i].c;
-          var name = cells[0] ? (cells[0].v || '').trim() : '';
-          var specSheet = cells[6] ? (cells[6].v || '').trim() : '';
+          var name = getCellP(cells, 0).trim();
+          var specSheet = getCellP(cells, 8).trim();
+          var priority = parseInt(getCellP(cells, 5), 10) || 99;
           if (name && name !== 'Name' && specSheet) {
-            addSpec(name, tab, specSheet);
+            addSpec(name, tab, specSheet, priority);
           }
         }
       })

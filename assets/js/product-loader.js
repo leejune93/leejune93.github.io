@@ -47,21 +47,33 @@ document.addEventListener('DOMContentLoaded', function () {
       var rows = json.table.rows;
 
       var products = [];
+
+      function getCell(cells, index) {
+        if (!cells || index >= cells.length || !cells[index]) return '';
+        return cells[index].v != null ? String(cells[index].v) : '';
+      }
+
       for (var i = 0; i < rows.length; i++) {
         var cells = rows[i].c;
         var product = {
-          name: cells[0] ? (cells[0].v || '') : '',
-          type: cells[1] ? (cells[1].v || '') : '',
-          description: cells[2] ? (cells[2].v || '') : '',
-          category: cells[3] ? (cells[3].v || '').toLowerCase().trim() : '',
-          subcategory: cells[4] ? (cells[4].v || '').toLowerCase().trim() : '',
-          image: cells[5] ? (cells[5].v || '') : '',
-          specSheet: cells[6] ? (cells[6].v || '') : ''
+          name: getCell(cells, 0),
+          type: getCell(cells, 1),
+          description: getCell(cells, 2),
+          category: getCell(cells, 3).toLowerCase().trim(),
+          subcategory: getCell(cells, 4).toLowerCase().trim(),
+          priority: parseInt(getCell(cells, 5), 10) || 99,
+          image: getCell(cells, 6),
+          flipImage: getCell(cells, 7),
+          specSheet: getCell(cells, 8),
+          altText: getCell(cells, 9)
         };
         if (product.name) {
           products.push(product);
         }
       }
+
+      // Sort by priority (1 = highest, empty = 99)
+      products.sort(function (a, b) { return a.priority - b.priority; });
 
       if (products.length === 0) {
         productGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--light-grey);padding:40px;">No products found. Products will appear here once added to the spreadsheet.</p>';
@@ -74,11 +86,16 @@ document.addEventListener('DOMContentLoaded', function () {
         var card = document.createElement('div');
         card.className = 'card product-card-item';
         card.setAttribute('data-subcategory', product.subcategory);
+        card.setAttribute('data-priority', product.priority);
         card.style.padding = '0';
 
         var imageURL = convertImageURL(product.image);
+        var flipImageURL = convertImageURL(product.flipImage);
+        var altText = product.altText || product.name;
         var imageHTML = imageURL
-          ? '<img src="' + escapeHTML(imageURL) + '" alt="' + escapeHTML(product.name) + '" style="width:100%;height:100%;object-fit:cover;">'
+          ? '<div class="product-image-flip' + (flipImageURL ? ' has-flip' : '') + '"><img class="product-img-main" src="' + escapeHTML(imageURL) + '" alt="' + escapeHTML(altText) + '" style="width:100%;height:100%;object-fit:cover;">' +
+            (flipImageURL ? '<img class="product-img-flip" src="' + escapeHTML(flipImageURL) + '" alt="' + escapeHTML(altText) + '" style="width:100%;height:100%;object-fit:cover;">' : '') +
+            '</div>'
           : '[Product Image]';
 
         var specURL = convertPdfURL(product.specSheet);
@@ -113,6 +130,8 @@ document.addEventListener('DOMContentLoaded', function () {
       initFiltering();
       initMobileFilter();
       initLightbox();
+      initImageFlip();
+      initSorting(products);
 
       var firstItem = sidebar.querySelector('li.active');
       if (firstItem) firstItem.click();
@@ -230,6 +249,46 @@ function initMobileFilter() {
   }
 }
 
+/**
+ * Initialize sort dropdown functionality
+ */
+function initSorting(products) {
+  var sortSelect = document.querySelector('.product-layout select[value], .product-layout select');
+  if (!sortSelect) return;
+
+  sortSelect.addEventListener('change', function () {
+    var value = this.value;
+    var cards = Array.from(document.querySelectorAll('.product-card-item'));
+    var grid = document.querySelector('.product-grid');
+    if (!grid || !cards.length) return;
+
+    if (value === 'az') {
+      cards.sort(function (a, b) {
+        var nameA = (a.querySelector('h3') || {}).textContent || '';
+        var nameB = (b.querySelector('h3') || {}).textContent || '';
+        return nameA.localeCompare(nameB);
+      });
+    } else if (value === 'za') {
+      cards.sort(function (a, b) {
+        var nameA = (a.querySelector('h3') || {}).textContent || '';
+        var nameB = (b.querySelector('h3') || {}).textContent || '';
+        return nameB.localeCompare(nameA);
+      });
+    } else {
+      // Default: sort by priority (stored as data attribute)
+      cards.sort(function (a, b) {
+        var pA = parseInt(a.getAttribute('data-priority') || '99', 10);
+        var pB = parseInt(b.getAttribute('data-priority') || '99', 10);
+        return pA - pB;
+      });
+    }
+
+    cards.forEach(function (card) {
+      grid.appendChild(card);
+    });
+  });
+}
+
 function updateCount(count) {
   var countEl = document.querySelector('.product-count');
   if (countEl) {
@@ -241,47 +300,78 @@ function updateCount(count) {
  * Lightbox for product images
  */
 function initLightbox() {
-  // Create lightbox overlay if it doesn't exist
   if (document.querySelector('.lightbox-overlay')) return;
 
   var overlay = document.createElement('div');
   overlay.className = 'lightbox-overlay';
   overlay.innerHTML =
     '<div class="lightbox-content">' +
-      '<button class="lightbox-close">&times;</button>' +
+      '<button class="lightbox-prev">&#8249;</button>' +
+      '<button class="lightbox-next">&#8250;</button>' +
       '<img src="" alt="">' +
       '<p class="lightbox-caption"></p>' +
+      '<p class="lightbox-counter"></p>' +
     '</div>';
   document.body.appendChild(overlay);
 
   var img = overlay.querySelector('img');
   var caption = overlay.querySelector('.lightbox-caption');
-  var closeBtn = overlay.querySelector('.lightbox-close');
+  var counter = overlay.querySelector('.lightbox-counter');
+  var prevBtn = overlay.querySelector('.lightbox-prev');
+  var nextBtn = overlay.querySelector('.lightbox-next');
+  var currentImages = [];
+  var currentIndex = 0;
 
-  // Close on overlay click
+  function showImage(index) {
+    currentIndex = index;
+    img.src = currentImages[index];
+    counter.textContent = currentImages.length > 1 ? (index + 1) + ' / ' + currentImages.length : '';
+    prevBtn.style.display = currentImages.length > 1 ? '' : 'none';
+    nextBtn.style.display = currentImages.length > 1 ? '' : 'none';
+  }
+
+  prevBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    showImage(currentIndex === 0 ? currentImages.length - 1 : currentIndex - 1);
+  });
+
+  nextBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    showImage(currentIndex === currentImages.length - 1 ? 0 : currentIndex + 1);
+  });
+
   overlay.addEventListener('click', function (e) {
-    if (e.target === overlay || e.target === closeBtn) {
+    if (e.target === overlay) {
       overlay.classList.remove('active');
     }
   });
 
-  // Close on Escape key
   document.addEventListener('keydown', function (e) {
+    if (!overlay.classList.contains('active')) return;
     if (e.key === 'Escape') overlay.classList.remove('active');
+    if (e.key === 'ArrowLeft') prevBtn.click();
+    if (e.key === 'ArrowRight') nextBtn.click();
   });
 
-  // Attach click to product images
   document.querySelectorAll('.product-card-item .card-image').forEach(function (cardImage) {
     cardImage.addEventListener('click', function () {
-      var productImg = this.querySelector('img');
-      if (!productImg) return;
+      var mainImg = this.querySelector('.product-img-main');
+      var flipImg = this.querySelector('.product-img-flip');
+      if (!mainImg) {
+        var singleImg = this.querySelector('img');
+        if (!singleImg) return;
+        mainImg = singleImg;
+      }
 
       var card = this.closest('.product-card-item');
       var name = card ? card.querySelector('h3') : null;
 
-      img.src = productImg.src;
-      img.alt = productImg.alt;
+      currentImages = [mainImg.src];
+      if (flipImg && flipImg.src) currentImages.push(flipImg.src);
+
+      img.alt = mainImg.alt || '';
       caption.textContent = name ? name.textContent : '';
+      showImage(0);
       overlay.classList.add('active');
     });
   });
@@ -301,6 +391,7 @@ function escapeHTML(str) {
  */
 function convertImageURL(url) {
   if (!url) return '';
+  // Only accept Google Drive file links or direct image URLs
   var match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if (match) {
     return 'https://lh3.googleusercontent.com/d/' + match[1];
@@ -310,7 +401,12 @@ function convertImageURL(url) {
   if (match2) {
     return 'https://lh3.googleusercontent.com/d/' + match2[1];
   }
-  return url;
+  // Only pass through URLs that look like direct image links
+  if (url.match(/\.(jpg|jpeg|png|gif|webp|avif|svg)(\?.*)?$/i)) {
+    return url;
+  }
+  // Reject non-image URLs (Google Sheets, Docs, etc.)
+  return '';
 }
 
 /**
@@ -325,4 +421,36 @@ function convertPdfURL(url) {
     return 'https://drive.google.com/file/d/' + match[1] + '/preview';
   }
   return url;
+}
+
+/**
+ * Initialize image flip on touch for mobile
+ * Desktop uses CSS :hover, mobile uses touchstart/touchend with 150ms delay
+ */
+function initImageFlip() {
+  var cards = document.querySelectorAll('.product-card-item');
+  if (!cards.length) return;
+
+  cards.forEach(function (card) {
+    var flipContainer = card.querySelector('.product-image-flip');
+    if (!flipContainer || !flipContainer.querySelector('.product-img-flip')) return;
+
+    var flipTimer = null;
+
+    card.addEventListener('touchstart', function (e) {
+      flipTimer = setTimeout(function () {
+        flipContainer.classList.add('flipped');
+      }, 150);
+    }, { passive: true });
+
+    card.addEventListener('touchend', function () {
+      clearTimeout(flipTimer);
+      flipContainer.classList.remove('flipped');
+    });
+
+    card.addEventListener('touchcancel', function () {
+      clearTimeout(flipTimer);
+      flipContainer.classList.remove('flipped');
+    });
+  });
 }
