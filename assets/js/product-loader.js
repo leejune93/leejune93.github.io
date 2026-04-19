@@ -133,8 +133,18 @@ document.addEventListener('DOMContentLoaded', function () {
       initImageFlip();
       initSorting(products);
 
-      var firstItem = sidebar.querySelector('li.active');
-      if (firstItem) firstItem.click();
+      // Check URL hash for pre-selected subcategory (from mega menu)
+      var hash = window.location.hash.replace('#', '');
+      var targetItem = null;
+      if (hash) {
+        targetItem = sidebar.querySelector('li[data-filter="' + hash + '"]');
+      }
+      if (targetItem) {
+        targetItem.click();
+      } else {
+        var firstItem = sidebar.querySelector('li.active');
+        if (firstItem) firstItem.click();
+      }
     })
     .catch(function (error) {
       console.error('Failed to load products from sheet "' + tabName + '":', error);
