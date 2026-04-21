@@ -1,9 +1,9 @@
 # Southern CGS — Production Website
 
 ## Project Overview
-Custom-coded production website for Southern Central Gas Suppliers (SCGS), a UK-based B2B gas equipment distributor. Migrated from Framer to custom HTML/CSS/JS.
+Custom-coded production website for Southern Central Gas Supplies (SCGS), a UK-based B2B gas equipment distributor. Migrated from Framer to custom HTML/CSS/JS.
 
-**Client:** Alvin Gibson — Southern Central Gas Suppliers
+**Client:** Alvin Gibson — Southern Central Gas Supplies
 **Designer/Developer:** Lee June — Lee June Designs
 **Reference project:** `C:\Users\Lee June\OneDrive\Documents\Claude-Code\SouthernCGS` (wireframes, proposals, sales docs, design decisions)
 
