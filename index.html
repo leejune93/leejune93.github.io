@@ -13,13 +13,35 @@
 
   <div id="nav-placeholder"></div>
 
-  <!-- ========== HERO ========== -->
-  <section class="hero">
+  <!-- ========== HERO (sticky-pin reveal) ========== -->
+  <div class="hero-pin-wrapper">
+    <section class="hero">
+      <div class="hero-background" aria-hidden="true"></div>
+      <div class="hero-layout">
+        <div class="hero-content">
+          <p class="section-label">Gas Regulation Specialists</p>
+          <h1>Precision Gas <span>Regulators</span> &amp; Valves for Industry</h1>
+          <p>From industrial to ultra-high purity applications — we supply the equipment that keeps your processes safe, reliable, and precise.</p>
+        </div>
+        <div class="hero-reveal-stack">
+          <div class="img-compare" data-offset="0.4" aria-label="Design to product comparison">
+            <img class="img-compare-before" src="assets/images/stock/product-wireframe.png" alt="Regulator technical drawing">
+            <img class="img-compare-after" src="assets/images/stock/product-render.png" alt="Regulator finished product">
+            <div class="img-compare-handle" aria-hidden="true">
+              <div class="img-compare-handle-circle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 7L5 12L11 17"/><path d="M13 7L19 12L13 17"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========== HERO ACTIONS (below the sticky-pin hero) ========== -->
+  <section class="hero-actions-section">
     <div class="container">
-      <div class="hero-content">
-        <p class="section-label">Gas Regulation Specialists</p>
-        <h1>Precision Gas <span>Regulators</span> &amp; Valves for Industry</h1>
-        <p>From industrial to ultra-high purity applications — we supply the equipment that keeps your processes safe, reliable, and precise.</p>
+      <div class="hero-actions">
         <div class="hero-buttons">
           <a href="pages/contact.html" class="btn btn-primary btn-lg">Connect with an Expert</a>
           <a href="pages/products/index.html" class="btn btn-secondary btn-lg">View Products</a>
@@ -39,15 +61,14 @@
           </div>
         </div>
       </div>
-      <!-- Hero image placeholder — Alvin to provide 3D render -->
     </div>
   </section>
 
   <!-- ========== PRODUCT CATEGORIES ========== -->
   <div class="category-scroll-wrapper">
-    <section class="category-sticky section" style="overflow:hidden;background:var(--white);padding:64px 0 4px;">
+    <section class="category-sticky section" style="overflow:hidden;background:var(--white);padding:32px 0 4px;">
       <div class="container">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;">
           <div>
             <p class="section-label-left">What We Supply</p>
             <h2 class="section-title">Product Categories</h2>
@@ -58,7 +79,7 @@
         <a href="pages/products/regulators.html" class="category-slide" style="text-decoration:none;color:inherit;max-width:600px;width:40vw;flex-shrink:0;">
           <div style="background:var(--bg-light);border:1px solid var(--border-grey);display:flex;flex-direction:column;">
             <div style="aspect-ratio:3/2;border-bottom:1px solid var(--border-grey);overflow:hidden;"><img src="assets/images/stock/category-regulators.png" alt="Regulators" style="width:100%;height:100%;object-fit:cover;"></div>
-            <div style="padding:24px;">
+            <div style="padding:16px 24px;">
               <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:4px;">7 Product Types</p>
               <h3 style="margin:0;">Regulators</h3>
             </div>
@@ -67,7 +88,7 @@
         <a href="pages/products/valves.html" class="category-slide" style="text-decoration:none;color:inherit;max-width:600px;width:40vw;flex-shrink:0;">
           <div style="background:var(--bg-light);border:1px solid var(--border-grey);display:flex;flex-direction:column;">
             <div style="aspect-ratio:3/2;border-bottom:1px solid var(--border-grey);overflow:hidden;"><img src="assets/images/stock/category-valves.png" alt="Valves" style="width:100%;height:100%;object-fit:cover;"></div>
-            <div style="padding:24px;">
+            <div style="padding:16px 24px;">
               <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:4px;">4 Product Types</p>
               <h3 style="margin:0;">Valves</h3>
             </div>
@@ -76,7 +97,7 @@
         <a href="pages/products/filters.html" class="category-slide" style="text-decoration:none;color:inherit;max-width:600px;width:40vw;flex-shrink:0;">
           <div style="background:var(--bg-light);border:1px solid var(--border-grey);display:flex;flex-direction:column;">
             <div style="aspect-ratio:3/2;border-bottom:1px solid var(--border-grey);overflow:hidden;"><img src="assets/images/stock/category-filters.png" alt="Filters" style="width:100%;height:100%;object-fit:cover;"></div>
-            <div style="padding:24px;">
+            <div style="padding:16px 24px;">
               <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:4px;">2 Product Types</p>
               <h3 style="margin:0;">Filters</h3>
             </div>
@@ -85,7 +106,7 @@
         <a href="pages/products/laboratory-fittings.html" class="category-slide" style="text-decoration:none;color:inherit;max-width:600px;width:40vw;flex-shrink:0;">
           <div style="background:var(--bg-light);border:1px solid var(--border-grey);display:flex;flex-direction:column;">
             <div style="aspect-ratio:3/2;border-bottom:1px solid var(--border-grey);overflow:hidden;"><img src="assets/images/stock/category-lab.png" alt="Laboratory Fittings" style="width:100%;height:100%;object-fit:cover;"></div>
-            <div style="padding:24px;">
+            <div style="padding:16px 24px;">
               <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:4px;">4 Product Types</p>
               <h3 style="margin:0;">Laboratory Fittings</h3>
             </div>
@@ -94,7 +115,7 @@
         <a href="pages/products/accessories.html" class="category-slide" style="text-decoration:none;color:inherit;max-width:600px;width:40vw;flex-shrink:0;">
           <div style="background:var(--bg-light);border:1px solid var(--border-grey);display:flex;flex-direction:column;">
             <div style="aspect-ratio:3/2;border-bottom:1px solid var(--border-grey);overflow:hidden;"><img src="assets/images/stock/category-accessories.png" alt="Accessories" style="width:100%;height:100%;object-fit:cover;"></div>
-            <div style="padding:24px;">
+            <div style="padding:16px 24px;">
               <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:4px;">6 Product Types</p>
               <h3 style="margin:0;">Accessories</h3>
             </div>
@@ -384,5 +405,95 @@
   <div id="footer-placeholder"></div>
 
   <script src="assets/js/components.js"></script>
+
+  <script>
+    // Hero sticky-pin: map page scroll to --scroll-y (0 to 1) on .hero,
+    // and set --target-translate so progress 1 = slider top covers last line of description
+    (function () {
+      var wrapper = document.querySelector('.hero-pin-wrapper');
+      var hero = wrapper && wrapper.querySelector('.hero');
+      var description = hero && hero.querySelector('.hero-content p:not(.section-label)');
+      var slider = hero && hero.querySelector('.img-compare');
+      if (!wrapper || !hero || !description || !slider) return;
+
+      var ticking = false;
+
+      function measureTargetTranslate() {
+        // Slider hard-stops when its top edge reaches the top of the description
+        var descTopInViewport = description.getBoundingClientRect().top;
+        var heroTop = hero.getBoundingClientRect().top;
+        var descTopInHero = descTopInViewport - heroTop;
+        var sliderTopInHero = slider.getBoundingClientRect().top - heroTop;
+        // current slider top may already be translated; undo by reading CSS variables
+        var currentProgress = parseFloat(hero.style.getPropertyValue('--scroll-y')) || 0;
+        var currentTranslate = parseFloat(hero.style.getPropertyValue('--target-translate')) || 0;
+        var sliderInitialTop = sliderTopInHero - currentProgress * currentTranslate;
+        var travel = (descTopInHero - 64) - sliderInitialTop; // stop 64px above description top
+        hero.style.setProperty('--target-translate', travel + 'px');
+      }
+
+      function update() {
+        var rect = wrapper.getBoundingClientRect();
+        var vh = window.innerHeight || document.documentElement.clientHeight;
+        var travel = rect.height - vh;
+        if (travel <= 0) { hero.style.setProperty('--scroll-y', 0); ticking = false; return; }
+        var scrolled = -rect.top;
+        var p = Math.max(0, Math.min(1, scrolled / travel));
+        hero.style.setProperty('--scroll-y', p);
+        ticking = false;
+      }
+      function onScroll() {
+        if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+      }
+      function onResize() {
+        measureTargetTranslate();
+        onScroll();
+      }
+
+      // Initial setup — defer to next frame so fonts + layout settle
+      window.requestAnimationFrame(function () {
+        measureTargetTranslate();
+        update();
+      });
+      // Re-measure after fonts finish loading (h1 font affects wrap)
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+          measureTargetTranslate();
+          update();
+        });
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onResize);
+    })();
+  </script>
+
+  <script>
+    // Image comparison slider (hero): drag / click / hover
+    (function () {
+      var sliders = document.querySelectorAll('.img-compare');
+      sliders.forEach(function (slider) {
+        var offset = parseFloat(slider.dataset.offset || '0.4');
+        setPos(offset * 100);
+        var dragging = false;
+
+        function setPos(pct) {
+          pct = Math.max(0, Math.min(100, pct));
+          slider.style.setProperty('--pos', pct + '%');
+        }
+        function posFromEvent(e) {
+          var rect = slider.getBoundingClientRect();
+          var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          setPos(((clientX - rect.left) / rect.width) * 100);
+        }
+
+        slider.addEventListener('mousedown', function (e) { dragging = true; posFromEvent(e); e.preventDefault(); });
+        slider.addEventListener('touchstart', function (e) { dragging = true; posFromEvent(e); }, { passive: true });
+        document.addEventListener('mousemove', function (e) { if (dragging) posFromEvent(e); });
+        document.addEventListener('touchmove', function (e) { if (dragging) posFromEvent(e); }, { passive: true });
+        document.addEventListener('mouseup', function () { dragging = false; });
+        document.addEventListener('touchend', function () { dragging = false; });
+      });
+    })();
+  </script>
 </body>
 </html>

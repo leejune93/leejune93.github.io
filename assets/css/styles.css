@@ -309,30 +309,79 @@ p { font-size: 15px; line-height: 1.75; color: var(--med-grey); letter-spacing: 
 /* ========================================
    Hero
    ======================================== */
-.hero {
-  background: var(--white);
-  padding: 120px 0;
-  min-height: 90vh;
+.hero-pin-wrapper {
   position: relative;
+  height: 150vh;
+}
+
+.hero {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   overflow: hidden;
-  min-height: 700px;
-  display: flex;
-  align-items: center;
+  background: var(--white);
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
   background-image: linear-gradient(to right, rgba(255,255,255,0.975), rgba(255,255,255,0.965), rgba(255,255,255,0.9)), url('../images/stock/hero-background.png');
   background-size: cover;
   background-position: center;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.hero .container {
-  display: block;
-  width: 100%;
+.hero-layout {
+  position: relative;
+  height: 100%;
+  z-index: 1;
 }
 
 .hero-content {
-  position: relative;
-  z-index: 2;
+  position: absolute;
+  top: max(144px, 15vh);
+  left: 0;
+  right: 0;
   max-width: 980px;
   margin: 0 auto;
+  padding: 0 40px;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  z-index: 1;
+}
+
+.hero-reveal-stack {
+  position: absolute;
+  top: 85vh;
+  left: 0;
+  right: 0;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  justify-items: center;
+  transform: translateY(calc(var(--scroll-y, 0) * var(--target-translate, -80vh)));
+  will-change: transform;
+  z-index: 2;
+}
+
+.hero-reveal-stack .img-compare {
+  max-height: 45vh;
+  width: min(520px, 45vh);
+}
+
+.hero-actions-section {
+  background: var(--white);
+  padding: 64px 0 120px;
+  position: relative;
+}
+
+.hero-actions-section .hero-actions {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 40px;
   display: grid;
   justify-items: center;
   text-align: center;
@@ -988,6 +1037,66 @@ p { font-size: 15px; line-height: 1.75; color: var(--med-grey); letter-spacing: 
    Category Slider
    ======================================== */
 .category-slider::-webkit-scrollbar { display: none; }
+
+/* ========================================
+   Image Comparison Slider (hero)
+   ======================================== */
+.img-compare {
+  --pos: 40%;
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+  cursor: ew-resize;
+  background: transparent;
+}
+.img-compare img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  mix-blend-mode: multiply;
+}
+.img-compare-after {
+  clip-path: inset(0 0 0 var(--pos));
+}
+.img-compare-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos);
+  width: 2px;
+  background: var(--white);
+  transform: translateX(-1px);
+  pointer-events: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.img-compare-handle-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--white);
+  border: 2px solid var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+@media (max-width: 720px) {
+  .img-compare { max-width: 100%; }
+}
 
 /* ========================================
    Product Lightbox
