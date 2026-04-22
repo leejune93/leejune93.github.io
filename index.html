@@ -486,12 +486,38 @@
           setPos(((clientX - rect.left) / rect.width) * 100);
         }
 
+        // Mouse: click-anywhere-to-jump + drag (desktop preserves old behavior)
         slider.addEventListener('mousedown', function (e) { dragging = true; posFromEvent(e); e.preventDefault(); });
-        slider.addEventListener('touchstart', function (e) { dragging = true; posFromEvent(e); }, { passive: true });
         document.addEventListener('mousemove', function (e) { if (dragging) posFromEvent(e); });
-        document.addEventListener('touchmove', function (e) { if (dragging) posFromEvent(e); }, { passive: true });
         document.addEventListener('mouseup', function () { dragging = false; });
-        document.addEventListener('touchend', function () { dragging = false; });
+
+        // Touch: manual direction detection — only drag if user's intent is horizontal
+        var touchStarted = false;
+        var startX = 0, startY = 0;
+
+        slider.addEventListener('touchstart', function (e) {
+          touchStarted = true;
+          dragging = false;
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function (e) {
+          if (!touchStarted || !e.touches[0]) return;
+          if (!dragging) {
+            var dx = e.touches[0].clientX - startX;
+            var dy = e.touches[0].clientY - startY;
+            var absDx = Math.abs(dx);
+            var absDy = Math.abs(dy);
+            if (absDx < 10 && absDy < 10) return; // below threshold — wait
+            if (absDy > absDx) { touchStarted = false; return; } // vertical intent — release
+            dragging = true; // horizontal intent — commit
+          }
+          if (e.cancelable) { e.preventDefault(); posFromEvent(e); }
+        }, { passive: false });
+
+        document.addEventListener('touchend', function () { touchStarted = false; dragging = false; });
+        document.addEventListener('touchcancel', function () { touchStarted = false; dragging = false; });
       });
     })();
   </script>

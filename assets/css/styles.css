@@ -1050,7 +1050,7 @@ p { font-size: 15px; line-height: 1.75; color: var(--med-grey); letter-spacing: 
   margin: 0 auto;
   overflow: hidden;
   user-select: none;
-  touch-action: none;
+  touch-action: pan-y;
   cursor: ew-resize;
   background: transparent;
 }
@@ -1348,6 +1348,7 @@ body[data-category] .product-grid.loaded {
 }
 
 @media (max-width: 1024px) {
+  .hero-content { top: max(88px, 8vh); }
   .grid-3, .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
   .footer-top-row {
     display: grid;
