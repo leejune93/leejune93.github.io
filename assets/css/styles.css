@@ -357,7 +357,7 @@ p { font-size: 15px; line-height: 1.75; color: var(--med-grey); letter-spacing: 
   top: 85vh;
   left: 0;
   right: 0;
-  max-width: 520px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 0 24px;
   display: grid;
@@ -368,8 +368,9 @@ p { font-size: 15px; line-height: 1.75; color: var(--med-grey); letter-spacing: 
 }
 
 .hero-reveal-stack .img-compare {
-  max-height: 45vh;
-  width: min(520px, 45vh);
+  max-width: 650px;
+  max-height: 55vh;
+  width: min(650px, 55vh);
 }
 
 .hero-actions-section {
@@ -456,6 +457,19 @@ p { font-size: 15px; line-height: 1.75; color: var(--med-grey); letter-spacing: 
   font-size: 13px;
   text-align: center;
   padding: 40px;
+}
+
+/* ========================================
+   Homepage — Category Scroll Cards
+   Card image default 3/2 on tall viewports; shorter on laptop/short
+   screens so the title/count below stays in view under the sticky nav.
+   ======================================== */
+.cat-card-image { aspect-ratio: 3/2; }
+@media (max-height: 900px) {
+  .cat-card-image { aspect-ratio: 16/9; }
+}
+@media (max-height: 720px) {
+  .cat-card-image { aspect-ratio: 2/1; }
 }
 
 /* ========================================
